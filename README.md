@@ -9,4 +9,4 @@ Plugin de pedidos por WhatsApp para WordPress con soporte multi-sucursal.
 - 📱 Formulario de datos validado para WhatsApp.
 
 ## Instalación
-Subir la carpeta `wa-order` a `/wp-content/plugins/` y activar.
+Subir la carpeta `wa-order` a `/wp-content/plugins/` y activar.# wa-order
