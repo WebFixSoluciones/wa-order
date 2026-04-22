@@ -411,63 +411,107 @@
   margin: .6rem 0;
 }
 
-/* Tarjetas cuadradas de variantes — horizontal scroll */
+/* ── Tarjetas de variantes — iOS style ─────────────────── */
 .wrm-variant-cards {
   display: flex;
-  gap: .5rem;
+  gap: .45rem;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-bottom: .25rem;
+  padding: .05rem 0 .3rem;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
 }
 .wrm-variant-cards::-webkit-scrollbar { display: none; }
+
 .wrm-variant-card {
   flex: 0 0 auto;
-  width: 78px;
-  min-height: 64px;
+  width: 74px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: .55rem .4rem .5rem;
-  border: 1.5px solid var(--wrm-border);
-  border-radius: 4px;
-  background: #fff;
+  justify-content: center;       /* centrado — elimina el espacio extra */
+  padding: .55rem .45rem .5rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;           /* iOS rounded */
+  background: #f9fafb;
   cursor: pointer;
-  transition: border-color .18s, background .18s, box-shadow .18s;
+  transition: border-color .15s ease,
+              background .15s ease,
+              box-shadow .15s ease,
+              transform .12s ease;
   text-align: center;
   scroll-snap-align: start;
-  gap: .3rem;
+  gap: .08rem;                   /* gap mínimo — todo junto */
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
-.wrm-variant-card .vc-price {
-  font-size: .82rem;
-  font-weight: 900;
-  color: var(--wrm-primary);
-  line-height: 1;
-}
-.wrm-variant-card .vc-name {
-  font-size: .72rem;
-  font-weight: 700;
-  color: var(--wrm-dark);
-  line-height: 1.2;
-  word-break: break-word;
-}
-.wrm-variant-card:hover {
-  border-color: var(--wrm-primary);
-  background: #f0fdf4;
-}
-.wrm-variant-card.selected {
-  border-color: var(--wrm-primary);
-  border-width: 2px;
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px rgba(37,211,102,.12);
-}
-.wrm-variant-card.selected .vc-price { color: #16a34a; }
-.wrm-variant-card.selected .vc-name { color: #166534; }
 
-/* Mantener compatibilidad — chips (no usadas ya) */
+/* Nombre: gris discreto — texto auxiliar */
+.wrm-variant-card .vc-name {
+  font-size: .68rem;
+  font-weight: 600;
+  color: #9ca3af;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+}
+
+/* Precio: protagonista — negro bold */
+.wrm-variant-card .vc-price {
+  font-size: .88rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.05;
+  letter-spacing: -.02em;
+}
+
+/* Hover sutil */
+.wrm-variant-card:hover {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+/* Press / tap — micro-bounce iOS */
+.wrm-variant-card:active {
+  transform: scale(.95);
+  transition-duration: .08s;
+}
+
+/* ── Estado seleccionado ────────────── */
+.wrm-variant-card.selected {
+  border-color: #22c55e;
+  border-width: 2px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(34,197,94,.18),
+              0 0 0 1px rgba(34,197,94,.08);
+  transform: translateY(-1px);
+}
+
+/* Checkmark badge — esquina superior derecha */
+.wrm-variant-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: .22rem;
+  right: .25rem;
+  width: 13px;
+  height: 13px;
+  background: #22c55e;
+  border-radius: 50%;
+  font-size: .48rem;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 13px;
+}
+
+/* Nombre y precio cuando está seleccionado */
+.wrm-variant-card.selected .vc-name  { color: #16a34a; }
+.wrm-variant-card.selected .vc-price { color: #111827; }
+
+/* Compatibilidad — chips (no activas) */
 .wrm-variant-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
 .wrm-variant-chip {
   display: inline-flex; align-items: center; gap: .4rem;
