@@ -82,6 +82,8 @@ function wrm_plugin_settings_page(){
     }
 
     $s = get_option('wrm_settings',[]);
+    wrm_create_locations_table();
+    wrm_maybe_migrate_options_to_locations_table();
     $matrix_rows = wrm_get_all_locations('matrix');
     $matrix = !empty($matrix_rows) ? $matrix_rows[0] : wrm_get_branch_defaults();
     $matrix = wp_parse_args($matrix, wrm_get_branch_defaults());
@@ -117,7 +119,7 @@ function wrm_plugin_settings_page(){
 .wrm-inline-note{font-size:.74rem;color:#6b7280;margin-top:.2rem}
 </style>
 <div class="wrm-p">
-<h1>🟢 WA Order <span class="wrm-badge">v0.8.3</span></h1>
+<h1>🟢 WA Order <span class="wrm-badge">v0.8.6</span></h1>
 <form method="post"><?php wp_nonce_field('wrm_plugin_nonce')?>
 <div class="wrm-tabs">
   <button type="button" class="wrm-tab-btn active" data-tab="general">General</button>
@@ -194,28 +196,6 @@ function wrm_plugin_settings_page(){
       <?php endforeach; ?>
     </div>
     <button type="button" class="wrm-add-branch" id="wrm-add-branch">+ Agregar sucursal</button>
-    
-    <template id="wrm-branch-template">
-        <div class="wrm-branch-card" data-index="{{i}}">
-            <div class="wrm-branch-head">
-                <div class="wrm-branch-title">Sucursal {{n}}</div>
-                <button type="button" class="wrm-del-branch" onclick="this.closest('.wrm-branch-card').remove()">Eliminar</button>
-            </div>
-            <div class="wrm-pg">
-                <div class="wrm-pf"><label>Nombre</label><input type="text" name="wrm_branches[{{i}}][name]" placeholder="Sucursal Norte"></div>
-                <div class="wrm-pf"><label>Teléfono</label><input type="text" name="wrm_branches[{{i}}][phone]" placeholder="0999999999"></div>
-                <div class="wrm-pf"><label>WhatsApp del local</label><input type="text" name="wrm_branches[{{i}}][whatsapp]" placeholder="593991234567"></div>
-                <div class="wrm-pf"><label>Cobertura / zona</label><input type="text" name="wrm_branches[{{i}}][coverage]" placeholder="Norte, Tumbaco, Valle"></div>
-                <div class="wrm-pf"><label>Ciudad</label><input type="text" name="wrm_branches[{{i}}][city]" placeholder="Quito"></div>
-                <div class="wrm-pf" style="grid-column:1/-1"><label>Dirección</label><input type="text" name="wrm_branches[{{i}}][address]" placeholder="Av. Siempre Viva 123"></div>
-                <div class="wrm-pf">
-                    <label class="wrm-switch"><input type="checkbox" name="wrm_branches[{{i}}][maps_enabled]" value="1"> Habilitar Google Maps</label>
-                </div>
-                <div class="wrm-pf"><label>Link Google Maps</label><input type="url" name="wrm_branches[{{i}}][maps_url]" placeholder="https://maps.google.com/... "></div>
-                <div class="wrm-pf"><label class="wrm-switch"><input type="checkbox" name="wrm_branches[{{i}}][is_active]" value="1" checked> Local activo</label></div>
-            </div>
-        </div>
-    </template>
   </div>
 </div>
 
@@ -286,48 +266,4 @@ add_action('edited_wrm_category', 'wrm_save_cat_icon');
 function wrm_save_cat_icon($tid){
     if(isset($_POST['wrm_cat_icon']))
         update_term_meta($tid,'wrm_cat_icon',sanitize_text_field($_POST['wrm_cat_icon']));
-}
-
-/**
- * Comprueba si hay una nueva versión disponible consultando un JSON remoto.
- * El aviso solo se muestra a administradores.
- */
-add_action('admin_init', 'wrm_check_for_update_notice');
-function wrm_check_for_update_notice() {
-    if (!current_user_can('manage_options')) return;
-
-    // URL del archivo JSON en tu servidor que contiene la última versión
-    $remote_url = 'https://api.webfixsoluciones.net/updates/wa-order.json'; 
-    $transient_key = 'wrm_remote_version_data';
-    $update_data = get_transient($transient_key);
-
-    if (false === $update_data) {
-        $response = wp_remote_get($remote_url, ['timeout' => 10]);
-        
-        if (is_wp_error($response)) {
-            // Si el servidor falla, guardamos un error breve para no reintentar en cada carga
-            set_transient($transient_key, ['error' => true], 2 * HOUR_IN_SECONDS);
-            return;
-        }
-
-        $body = wp_remote_retrieve_body($response);
-        $update_data = json_decode($body, true);
-        
-        // Cacheamos el resultado por 12 horas
-        set_transient($transient_key, $update_data, 12 * HOUR_IN_SECONDS);
-    }
-
-    // Comparamos la versión actual (WRM_VERSION) con la remota
-    if (isset($update_data['version']) && version_compare(WRM_VERSION, $update_data['version'], '<')) {
-        add_action('admin_notices', function() use ($update_data) {
-            $url = !empty($update_data['url']) ? $update_data['url'] : 'https://webfixsoluciones.net';
-            ?>
-            <div class="notice notice-warning is-dismissible" style="border-left-color: #25d366;">
-                <p style="font-size: 14px;">🚀 <strong>WA Order:</strong> Hay una nueva versión disponible (<strong>v<?php echo esc_html($update_data['version']); ?></strong>). 
-                Actualiza para disfrutar de las últimas mejoras en la gestión de sucursales. 
-                <a href="<?php echo esc_url($url); ?>" target="_blank" style="margin-left: 10px; font-weight: bold; color: #128c7e; text-decoration: none;">Ver qué hay de nuevo →</a></p>
-            </div>
-            <?php
-        });
-    }
 }

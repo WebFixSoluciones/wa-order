@@ -56,6 +56,8 @@ function wrm_menu_shortcode($atts=[]){
     if($atts['category']) $q_args['tax_query']=[['taxonomy'=>'wrm_category','field'=>'slug','terms'=>explode(',',$atts['category'])]];
 
     $items = new WP_Query($q_args);
+    $opts = get_option('wrm_settings',[]);
+    $cur  = $opts['currency'] ?? '$';
     while($items->have_posts()): $items->the_post();
         $id       = get_the_ID();
         $price    = (float)(get_post_meta($id,'_wrm_price',true)   ?: 0);
@@ -69,9 +71,7 @@ function wrm_menu_shortcode($atts=[]){
         $item_cats= wp_get_post_terms($id,'wrm_category',['fields'=>'slugs']);
         $cats_str = implode(' ',$item_cats);
         $img      = get_the_post_thumbnail_url($id,'medium') ?: '';
-        $desc     = get_the_excerpt() ?: wp_trim_words(get_the_content(),'',15,'…');
-        $opts = get_option('wrm_settings',[]);
-        $cur  = $opts['currency'] ?? '$';
+        $desc     = get_the_excerpt() ?: wp_trim_words(get_the_content(), 15, '…');
   ?>
   <div class="wrm-item-card <?php echo $avail?'':'wrm-unavailable'?> <?php echo $featured?'wrm-featured':''?>"
        data-id="<?php echo $id?>"

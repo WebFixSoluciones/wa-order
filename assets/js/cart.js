@@ -85,8 +85,6 @@ function getSelectedLocationCity(mode){
 function syncSelectedLocation(mode, forcedIdx){
   var locations = getAvailableLocations();
   if(!locations.length) return;
-  if(!locations.length) return null;
-
   if(mode === 'pickup'){
     var idx = typeof forcedIdx !== 'undefined' ? forcedIdx : locations.findIndex(function(loc){ return selectedPickupBranchId !== null && String(loc.id) === String(selectedPickupBranchId); });
     if(idx < 0) idx = 0;
@@ -94,10 +92,6 @@ function syncSelectedLocation(mode, forcedIdx){
     selectedPickupBranchId = selectedPickupBranch && typeof selectedPickupBranch.id !== 'undefined' ? selectedPickupBranch.id : idx;
     markActiveBranchCard('pickup', locations.indexOf(selectedPickupBranch));
     $('#wrm-pickup-addr').text(locationAddressLine(selectedPickupBranch) || locationLabel(selectedPickupBranch));
-    
-    // UI Update
-    var addr = locationAddressLine(selectedPickupBranch) || locationLabel(selectedPickupBranch);
-    $('#wrm-pickup-addr').text(addr);
   } else {
     var didx = typeof forcedIdx !== 'undefined' ? forcedIdx : locations.findIndex(function(loc){ return selectedDeliveryBranchId !== null && String(loc.id) === String(selectedDeliveryBranchId); });
     if(didx < 0) didx = 0;
@@ -105,12 +99,7 @@ function syncSelectedLocation(mode, forcedIdx){
     selectedDeliveryBranchId = selectedDeliveryBranch && typeof selectedDeliveryBranch.id !== 'undefined' ? selectedDeliveryBranch.id : didx;
     markActiveBranchCard('delivery', locations.indexOf(selectedDeliveryBranch));
     $('#wrm-d-city').val(getSelectedLocationCity('delivery'));
-    
-    // UI Update: Sincronizar ciudad en base y modal
-    var city = getSelectedLocationCity('delivery');
-    $('#wrm-d-city, #wrm-m-city').val(city);
   }
-  return mode === 'pickup' ? selectedPickupBranch : selectedDeliveryBranch;
 }
 
 function ensureCleanBranchStyles(){
@@ -118,7 +107,6 @@ function ensureCleanBranchStyles(){
   var css = ''+
     '.wrm-branch-select-wrap{margin:.7rem 0 .5rem;}'+
     '.wrm-branch-mini-title{font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin:0 0 .42rem;}'+
-    '.wrm-branch-mini-title{font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#9ca3af;margin:0 0 .5rem;}'+
     '.wrm-branch-cards{display:flex;gap:.55rem;overflow-x:auto;overflow-y:hidden;padding:.05rem 0 .3rem;scrollbar-width:thin;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;}'+
     '.wrm-branch-cards::after{content:"";flex:0 0 .15rem;}'+
     '.wrm-branch-cards::-webkit-scrollbar{height:6px;}'+
@@ -130,22 +118,23 @@ function ensureCleanBranchStyles(){
     '.wrm-branch-card-mini .wrm-branch-sub{font-size:.74rem;line-height:1.25;color:#6b7280;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}'+
         '.wrm-branch-card-mini:hover{border-color:#c8d0d8;transform:translateY(-1px);}'+
     '.wrm-branch-card-mini.active{border-color:#22c55e;background:#f0fdf4;box-shadow:0 0 0 2px rgba(34,197,94,.10);}'+
-    '.wrm-branch-card-mini{flex:0 0 160px;min-width:160px;text-align:left;background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:.7rem;display:flex;flex-direction:column;gap:.3rem;transition:all .2s ease;cursor:pointer;scroll-snap-align:start;}'+
-    '.wrm-branch-card-mini .wrm-branch-name{font-size:.65rem;font-weight:900;line-height:1;color:#6b7280;margin:0;text-transform:uppercase;letter-spacing:.05em;}'+
-    '.wrm-branch-card-mini .wrm-branch-name.is-bubble{display:inline-block;background:#f3f4f6;padding:.25rem .5rem;border-radius:6px;}'+
-    '.wrm-branch-card-mini .wrm-branch-sub{font-size:.75rem;font-weight:600;color:#111827;line-height:1.2;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}'+
-    '.wrm-branch-card-mini:hover{border-color:#d1d5db;background:#f9fafb;}'+
-    '.wrm-branch-card-mini.active{border-color:#22c55e;background:#f0fdf4;box-shadow:0 0 0 1px #22c55e;}'+
-    '.wrm-branch-card-mini.active .wrm-branch-name{color:#15803d;background:#dcfce7;}'+
     '.wrm-branch-card-mini.active .wrm-branch-name{color:#166534;}'+
     '.wrm-branch-scroll-hint{display:none;font-size:.7rem;line-height:1.2;color:#9ca3af;margin:.15rem 0 0;text-align:right;}'+
     '.wrm-delivery-modal{position:fixed;inset:0;z-index:100001;display:none;}'+
     '.wrm-delivery-modal.open{display:block;}'+
     '.wrm-delivery-modal-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.52);backdrop-filter:blur(4px);}'+
     '.wrm-delivery-modal-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94vw,440px);max-height:min(90vh,680px);overflow-y:auto;overflow-x:hidden;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(15,23,42,.22);padding:.75rem .75rem .8rem;border:1px solid rgba(0,0,0,.06);}'+
-    '.wrm-delivery-modal-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.6rem;padding-bottom:.5rem;border-bottom:1px solid #f0f2f5;}'+
+    '.wrm-delivery-modal-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:0;padding-bottom:.5rem;border-bottom:1px solid #f0f2f5;}'+
+    '.wrm-delivery-modal-head-left{display:flex;align-items:center;gap:.55rem;}'+
+    '.wrm-delivery-modal-icon{font-size:1.5rem;flex-shrink:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:#f0fdf4;border-radius:10px;}'+
     '.wrm-delivery-modal-title{font-size:.92rem;font-weight:800;line-height:1.15;color:#111827;margin:0;}'+
     '.wrm-delivery-modal-sub{font-size:.7rem;line-height:1.3;color:#9ca3af;margin:.1rem 0 0;}'+
+    '.wrm-delivery-modal-summary{display:flex;align-items:center;justify-content:space-between;padding:.55rem .7rem;margin:.5rem 0 .6rem;background:#f8fafc;border:1px solid #e9ecf0;border-radius:10px;font-size:.78rem;color:#374151;}'+
+    '.wrm-dms-left{display:flex;align-items:center;gap:.35rem;font-weight:600;}'+
+    '.wrm-dms-icon{font-size:.95rem;}'+
+    '.wrm-dms-right{font-weight:600;}'+
+    '.wrm-dms-label{color:#6b7280;font-weight:500;}'+
+    '.wrm-dms-right strong{color:#111827;font-size:.88rem;font-weight:800;margin-left:.2rem;}'+
     '.wrm-delivery-modal-close{width:32px;height:32px;border-radius:50%;background:#f3f4f6;border:none;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#6b7280;flex:0 0 32px;cursor:pointer;transition:background .15s;}'+
     '.wrm-delivery-modal-close:hover{background:#e5e7eb;color:#111827;}'+
     '.wrm-delivery-modal-body-inner{background:#fafbfc;border:1px solid #eef0f3;border-radius:14px;padding:.6rem .6rem .55rem;}'+
@@ -186,8 +175,18 @@ function ensureDeliveryModal(){
       '<div class="wrm-delivery-modal-backdrop" data-close-delivery></div>'+
       '<div class="wrm-delivery-modal-panel" role="dialog" aria-modal="true" aria-labelledby="wrm-delivery-modal-title">'+
         '<div class="wrm-delivery-modal-head">'+
-          '<div><h3 class="wrm-delivery-modal-title" id="wrm-delivery-modal-title">Datos de delivery</h3><p class="wrm-delivery-modal-sub">Completa la información para enviar tu pedido por WhatsApp.</p></div>'+
+          '<div class="wrm-delivery-modal-head-left">'+
+            '<span class="wrm-delivery-modal-icon">🛵</span>'+
+            '<div>'+
+              '<h3 class="wrm-delivery-modal-title" id="wrm-delivery-modal-title">Datos de envío</h3>'+
+              '<p class="wrm-delivery-modal-sub">Completa la información para enviar tu pedido por WhatsApp.</p>'+
+            '</div>'+
+          '</div>'+
           '<button type="button" class="wrm-delivery-modal-close" data-close-delivery aria-label="Cerrar">×</button>'+
+        '</div>'+
+        '<div class="wrm-delivery-modal-summary" id="wrm-delivery-modal-summary">'+
+          '<div class="wrm-dms-left"><span class="wrm-dms-icon">🛒</span> <span id="wrm-dms-items">0 productos</span></div>'+
+          '<div class="wrm-dms-right"><span class="wrm-dms-label">Total:</span> <strong id="wrm-dms-total">$0.00</strong></div>'+
         '</div>'+
         '<div class="wrm-delivery-modal-body-inner"><div id="wrm-delivery-modal-body"></div></div>'+
         '<button type="button" class="wrm-wa-send-btn wrm-wa-send-inline" id="wrm-wa-send-btn-delivery"><span>Ordenar por WhatsApp</span></button>'+
@@ -195,8 +194,15 @@ function ensureDeliveryModal(){
     '</div>';
   $('body').append(html);
 }
+function updateDeliveryModalSummary(){
+  var totalItems = cart.reduce(function(s,i){ return s + i.qty; }, 0);
+  var label = totalItems === 1 ? '1 producto' : totalItems + ' productos';
+  $('#wrm-dms-items').text(label);
+  $('#wrm-dms-total').text(fmt(getTotal()));
+}
 function openDeliveryModal(){
   ensureDeliveryModal();
+  updateDeliveryModalSummary();
   var formHtml = $('#wrm-delivery-form-wrap .wrm-delivery-form').length ? $('#wrm-delivery-form-wrap .wrm-delivery-form').prop('outerHTML') : '';
   $('#wrm-delivery-modal-body').html(formHtml);
   // Inyectar selector de sucursal dentro del modal (encima del formulario)
@@ -234,7 +240,7 @@ function closeDeliveryModal(){
     $form.insertBefore('#wrm-cart-footer').removeClass('open').hide();
   }
   $('#wrm-delivery-modal').removeClass('open').attr('aria-hidden','true');
-  $('body').css('overflow','hidden');
+  $('body').css('overflow','');
 }
 function ensureBranchSelectors(){
   if(!$('#wrm-pickup-branch-wrap').length && $('#wrm-pickup-confirm').length){
@@ -355,19 +361,20 @@ function buildWhatsAppMessage(){
   if(deliveryMode==='delivery'){ var feeTxt=(window.WRMCart&&WRMCart.delivery_fee)?WRMCart.delivery_fee:''; if(feeTxt) lines.push('🛵 Envío: '+feeTxt); lines.push('💰 *TOTAL: '+fmt(getTotal())+'*'); } else { lines.push('💰 *TOTAL: '+fmt(getTotal())+'*'); }
   lines.push('─────────────────────────');
   if(deliveryMode==='pickup'){
-    var loc = getSelectedLocationData('pickup');
+    syncSelectedLocation('pickup');
     lines.push('','🏪 *RECOGE EN EL LOCAL*');
-    if(loc){
-      lines.push('📍 Local: '+loc.name);
-      if(loc.address) lines.push('📌 Dirección: '+loc.address);
-      if(loc.maps_enabled === '1' && loc.maps_url) lines.push('🗺️ Ubicación: '+loc.maps_url);
+    if(selectedPickupBranch){
+      lines.push('📍 Local seleccionado: '+locationLabel(selectedPickupBranch));
+      if(selectedPickupBranch.address) lines.push('📌 Dirección: '+selectedPickupBranch.address);
+      if(selectedPickupBranch.maps_enabled === '1' && selectedPickupBranch.maps_url) lines.push('🗺️ Maps: '+selectedPickupBranch.maps_url);
     }
   } else if(deliveryMode==='delivery'){
-    var loc = getSelectedLocationData('delivery');
+    syncSelectedLocation('delivery');
     lines.push('','🛵 *DELIVERY A DOMICILIO*');
-    if(loc){
-      lines.push('🏪 SUCURSAL DE DESPACHO: '+loc.name);
-      if(loc.maps_enabled === '1' && loc.maps_url) lines.push('🗺️ Ubicación local: '+loc.maps_url);
+    if(selectedDeliveryBranch){
+      lines.push('🏪 SUCURSAL ORIGEN: '+locationLabel(selectedDeliveryBranch));
+      if(selectedDeliveryBranch.address) lines.push('📌 Local origen: '+selectedDeliveryBranch.address);
+      if(selectedDeliveryBranch.maps_enabled === '1' && selectedDeliveryBranch.maps_url) lines.push('🗺️ Maps local: '+selectedDeliveryBranch.maps_url);
     }
     var isModal=$('#wrm-delivery-modal').hasClass('open'),$mb=$('#wrm-delivery-modal-body');
     var n=(isModal&&$mb.find('#wrm-m-name').val())?$mb.find('#wrm-m-name').val().trim():$('#wrm-d-name').val().trim();
@@ -382,6 +389,51 @@ function buildWhatsAppMessage(){
   return lines.join('\n');
 }
 $(document).ready(function(){
+  /* ── Filtro de categorías (tabs) ──────────────────── */
+  $(document).on('click', '.wrm-cat-tab', function(){
+    var cat = $(this).data('cat');
+    $('.wrm-cat-tab').removeClass('active').attr('aria-selected','false');
+    $(this).addClass('active').attr('aria-selected','true');
+    var $grid = $('#wrm-items-grid');
+    var $cards = $grid.find('.wrm-item-card');
+    var searchVal = ($('#wrm-search').val() || '').toLowerCase().trim();
+    var visibleCount = 0;
+    $cards.each(function(){
+      var $card = $(this);
+      var cats = ($card.attr('data-cats') || '').split(' ');
+      var title = ($card.attr('data-title') || '').toLowerCase();
+      var matchCat = (cat === 'all' || cats.indexOf(cat) !== -1);
+      var matchSearch = (!searchVal || title.indexOf(searchVal) !== -1);
+      if(matchCat && matchSearch){ $card.show(); visibleCount++; } else { $card.hide(); }
+    });
+    $('#wrm-no-results').toggle(visibleCount === 0);
+  });
+
+  /* ── Buscador de productos ───────────────────────── */
+  $(document).on('input', '#wrm-search', function(){
+    var val = $(this).val().toLowerCase().trim();
+    var activeCat = $('.wrm-cat-tab.active').data('cat') || 'all';
+    var $cards = $('#wrm-items-grid .wrm-item-card');
+    var visibleCount = 0;
+    // Mostrar/ocultar botón clear
+    $('#wrm-search-clear').toggle(val.length > 0);
+    $cards.each(function(){
+      var $card = $(this);
+      var title = ($card.attr('data-title') || '').toLowerCase();
+      var cats = ($card.attr('data-cats') || '').split(' ');
+      var matchCat = (activeCat === 'all' || cats.indexOf(activeCat) !== -1);
+      var matchSearch = (!val || title.indexOf(val) !== -1);
+      if(matchCat && matchSearch){ $card.show(); visibleCount++; } else { $card.hide(); }
+    });
+    $('#wrm-no-results').toggle(visibleCount === 0);
+  });
+
+  /* ── Botón limpiar búsqueda ──────────────────────── */
+  $(document).on('click', '#wrm-search-clear', function(){
+    $('#wrm-search').val('').trigger('input');
+    $(this).hide();
+  });
+
   $(document).on('click','#wrm-cart-fab', openCart);
   $(document).on('click','#wrm-cart-close, #wrm-cart-overlay', closeCart);
   $(document).on('click','.wrm-add-btn', function(){

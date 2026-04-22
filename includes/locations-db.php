@@ -19,7 +19,6 @@ function wrm_create_locations_table(){
         phone varchar(50) NOT NULL DEFAULT '',
         whatsapp varchar(50) NOT NULL DEFAULT '',
         coverage text NULL,
-        city varchar(100) NOT NULL DEFAULT '',
         maps_enabled tinyint(1) NOT NULL DEFAULT 0,
         maps_url text NULL,
         is_active tinyint(1) NOT NULL DEFAULT 1,
@@ -43,7 +42,6 @@ function wrm_default_location_row($type='branch'){
         'phone' => '',
         'whatsapp' => '',
         'coverage' => '',
-        'city' => '',
         'maps_enabled' => 0,
         'maps_url' => '',
         'is_active' => 1,
@@ -60,7 +58,6 @@ function wrm_normalize_location_db_row($row, $defaults = []){
         'phone' => sanitize_text_field($row['phone'] ?? ''),
         'whatsapp' => preg_replace('/[^0-9]/','', (string)($row['whatsapp'] ?? '')),
         'coverage' => sanitize_text_field($row['coverage'] ?? ''),
-        'city' => sanitize_text_field($row['city'] ?? ''),
         'maps_enabled' => !empty($row['maps_enabled']) ? 1 : 0,
         'maps_url' => esc_url_raw($row['maps_url'] ?? ''),
         'is_active' => !empty($row['is_active']) ? 1 : 0,
@@ -92,7 +89,7 @@ function wrm_replace_locations_by_type($type, $rows){
         $clean['sort_order'] = $i;
         $clean['created_at'] = current_time('mysql');
         $clean['updated_at'] = current_time('mysql');
-        $wpdb->insert($table, $clean, ['%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%s','%s']);
+        $wpdb->insert($table, $clean, ['%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%s','%s']);
         $i += 1;
     }
 }
@@ -119,7 +116,6 @@ function wrm_maybe_migrate_options_to_locations_table($force = false){
         'phone' => sanitize_text_field($matrix['phone'] ?? ''),
         'whatsapp' => preg_replace('/[^0-9]/','', $matrix['whatsapp'] ?? ''),
         'coverage' => sanitize_text_field($matrix['coverage'] ?? ''),
-        'city' => sanitize_text_field($matrix['city'] ?? ''),
         'maps_enabled' => !empty($matrix['maps_enabled']) ? 1 : 0,
         'maps_url' => esc_url_raw($matrix['maps_url'] ?? ''),
         'is_active' => !empty($matrix['is_active']) ? 1 : 0,
@@ -135,7 +131,6 @@ function wrm_maybe_migrate_options_to_locations_table($force = false){
             'phone' => sanitize_text_field($b['phone'] ?? ''),
             'whatsapp' => preg_replace('/[^0-9]/','', $b['whatsapp'] ?? ''),
             'coverage' => sanitize_text_field($b['coverage'] ?? ''),
-            'city' => sanitize_text_field($b['city'] ?? ''),
             'maps_enabled' => !empty($b['maps_enabled']) ? 1 : 0,
             'maps_url' => esc_url_raw($b['maps_url'] ?? ''),
             'is_active' => !empty($b['is_active']) ? 1 : 0,

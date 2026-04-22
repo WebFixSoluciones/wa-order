@@ -1,21 +1,20 @@
 <?php
 /**
- * Plugin Name:       WA Order v0.8.2
- * Plugin URI:        https://webfixsoluciones.net
+ * Plugin Name:       WA Order
+ * Plugin URI:        https://webfix.ec
  * Description:       Menú visual para restaurantes con carrito popup y pedidos directos por WhatsApp. Soporte para delivery/recogida, variantes, extras y shortcode [wrm_menu].
- * Version:           0.8.3
+ * Version:           0.9.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WebFix
- * Author URI:        https://webfixsoluciones.net
+ * Author URI:        https://webfix.ec
  * License:           GPL-2.0-or-later
  * Text Domain:       wrm-menu
  * Domain Path:       /languages
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'WRM_VERSION',  '0.8.3' );
-define( 'WRM_DB_VERSION', '1.0.0' ); // Versión de la estructura de la base de datos
+define( 'WRM_VERSION',  '0.9.0' );
 define( 'WRM_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'WRM_URI',      plugin_dir_url( __FILE__ ) );
 define( 'WRM_PREFIX',   'wrm_menu' );
@@ -78,14 +77,9 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 /* ── Activación / Desactivación ───────────────────────────── */
 register_activation_hook( __FILE__, function () {
     wrm_register_post_type();
-    
-    // Cargar dependencias necesarias para la activación
-    require_once WRM_DIR . 'includes/locations-db.php';
     wrm_create_locations_table();
-    wrm_maybe_migrate_options_to_locations_table();    
-    
+    wrm_maybe_migrate_options_to_locations_table();
     flush_rewrite_rules();
-
     if ( ! get_option('wrm_settings') ) {
         update_option( 'wrm_settings', [
             'whatsapp'      => '',
@@ -97,16 +91,6 @@ register_activation_hook( __FILE__, function () {
         ]);
     }
 } );
-
-/* ── Verificación de actualización de DB ────────────────── */
-add_action( 'plugins_loaded', function() {
-    $installed_ver = get_option( 'wrm_locations_db_version' );
-    if ( $installed_ver !== WRM_DB_VERSION ) {
-        require_once WRM_DIR . 'includes/locations-db.php';
-        wrm_create_locations_table(); // dbDelta se encarga de actualizar columnas
-        update_option( 'wrm_locations_db_version', WRM_DB_VERSION );
-    }
-});
 
 register_deactivation_hook( __FILE__, function () {
     flush_rewrite_rules();

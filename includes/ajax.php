@@ -17,7 +17,7 @@ function wrm_ajax_get_item(){
     wp_send_json_success([
         'id'       => $id,
         'title'    => get_the_title($id),
-        'desc'     => get_the_excerpt($id) ?: wp_trim_words(get_post_field('post_content',$id),'',20,'…'),
+        'desc'     => get_the_excerpt($id) ?: wp_trim_words(get_post_field('post_content',$id), 20, '…'),
         'price'    => (float)(get_post_meta($id,'_wrm_price',true) ?: 0),
         'price_old'=> (float)(get_post_meta($id,'_wrm_price_old',true) ?: 0),
         'badge'    => get_post_meta($id,'_wrm_badge',true),

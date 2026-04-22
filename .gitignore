@@ -2,9 +2,16 @@
 node_modules/
 .DS_Store
 Thumbs.db
+desktop.ini
 *.log
+*.zip
+*.tar.gz
 
 # IDEs
 .vscode/
 .idea/
 *.sublime-project
+*.sublime-workspace
+
+# WordPress backup/temp
+backups/

@@ -169,50 +169,6 @@
 }
 .wrm-pickup-confirm.visible { display: flex; }
 
-/* ── Branch Cards Compactas v0.8.3 ───────────────────── */
-.wrm-branch-cards {
-  display: flex; gap: .6rem; overflow-x: auto; padding: .1rem 0 .5rem;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
-}
-.wrm-branch-card-mini {
-  flex: 0 0 160px; background: #fff; border: 1.5px solid #e5e7eb;
-  border-radius: 12px; padding: .7rem; display: flex; flex-direction: column;
-  gap: .25rem; transition: all .2s; cursor: pointer; text-align: left;
-}
-.wrm-branch-card-mini .wrm-branch-name {
-  font-size: .62rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: .05em; color: #9ca3af; display: inline-block;
-}
-.wrm-branch-card-mini .wrm-branch-sub {
-  font-size: .8rem; font-weight: 700; color: #111; line-height: 1.2;
-}
-.wrm-branch-card-mini .wrm-branch-coverage {
-  font-size: .68rem; color: #6b7280; font-weight: 400;
-}
-.wrm-branch-card-mini.active {
-  border-color: var(--wrm-primary); background: #f0fdf4;
-  box-shadow: 0 0 0 1px var(--wrm-primary);
-}
-.wrm-branch-card-mini.active .wrm-branch-name { color: var(--wrm-primary); }
-
-/* Modal Delivery Refined */
-.wrm-delivery-modal { position: fixed; inset: 0; z-index: 10000; display: none; }
-.wrm-delivery-modal.open { display: flex; align-items: center; justify-content: center; }
-.wrm-delivery-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); }
-.wrm-delivery-modal-panel {
-  position: relative; width: 92%; max-width: 440px; background: #fff;
-  border-radius: 20px; padding: 1.25rem; box-shadow: 0 20px 50px rgba(0,0,0,.2);
-  max-height: 90vh; overflow-y: auto;
-}
-.wrm-delivery-modal-head { margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: .75rem; }
-.wrm-delivery-modal-title { font-size: 1.1rem; font-weight: 800; color: #111; }
-.wrm-delivery-modal-sub { font-size: .8rem; color: #6b7280; }
-
-@media (min-width: 768px) {
-  .wrm-branch-cards { flex-wrap: wrap; overflow: visible; }
-  .wrm-branch-card-mini { flex: 1 1 calc(50% - .6rem); }
-}
-
 /* Form delivery */
 .wrm-delivery-form-wrap {
   overflow: hidden;
