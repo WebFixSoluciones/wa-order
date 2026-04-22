@@ -311,24 +311,91 @@ function renderCart(){
 }
 function flashFAB(){ var $fab = $('#wrm-cart-fab'); $fab.css('transform','scale(1.25)'); setTimeout(function(){ $fab.css('transform',''); }, 300); }
 function openProductModal(data){
-  var variants = data.variants || [], extras = data.extras || [], html = '', basePrice = parseFloat(data.price)||0;
-  if(data.img) html += '<img class="wrm-modal-img" src="'+data.img+'" alt="'+data.title+'">';
-  html += '<h2 class="wrm-modal-title">'+data.title+'</h2>';
-  if(data.desc) html += '<p class="wrm-modal-desc">'+data.desc+'</p>';
-  html += '<div class="wrm-modal-price" id="wrm-modal-price">'+fmt(basePrice)+'</div>';
-  if(variants.length){ html += '<div class="wrm-modal-section">Elige una opción</div><div class="wrm-variant-list">'; variants.forEach(function(v,i){ html += '<div class="wrm-variant-item'+(i===0?' selected':'')+'" data-price="'+v.price+'" data-name="'+v.name+'" onclick="WRMModal.selectVariant(this)"><span class="v-name">'+v.name+'</span><span class="v-price">'+fmt(v.price)+'</span></div>'; }); html += '</div>'; basePrice = parseFloat(variants[0].price)||basePrice; }
-  if(extras.length){ html += '<div class="wrm-modal-section">Extras (opcional)</div><div class="wrm-extra-list">'; extras.forEach(function(e){ html += '<div class="wrm-extra-item"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;width:100%"><input type="checkbox" class="wrm-extra-check" data-price="'+e.price+'" data-name="'+e.name+'" onchange="WRMModal.updatePrice()"><span class="e-name">'+e.name+'</span></label><span class="e-price">+'+fmt(e.price)+'</span></div>'; }); html += '</div>'; }
-  html += '<div class="wrm-modal-section">Cantidad</div><div class="wrm-modal-qty"><button class="wrm-qty-btn" onclick="WRMModal.changeQty(-1)">−</button><span class="wrm-qty-val" id="wrm-modal-qty">1</span><button class="wrm-qty-btn" onclick="WRMModal.changeQty(1)">+</button></div>';
-  html += '<div class="wrm-modal-notes"><div class="wrm-modal-section">Notas (opcional)</div><textarea id="wrm-modal-notes" placeholder="Sin cebolla, poco picante…"></textarea></div>';
-  html += '<button class="wrm-modal-add-btn" id="wrm-modal-add-btn" data-id="'+data.id+'" data-title="'+data.title+'" data-base="'+data.price+'" data-img="'+(data.img||'')+'">Agregar al carrito</button>';
-  $('#wrm-modal-content').html(html); $('#wrm-product-modal').show(); $('body').css('overflow','hidden'); window.WRMModal._basePrice = basePrice; window.WRMModal._qty = 1; window.WRMModal.updatePrice();
+  var variants = data.variants || [], extras = data.extras || [], basePrice = parseFloat(data.price)||0;
+
+  // ── Cabecera: imagen izq + info der ──────────────────────────────────
+  var headerHtml = '<div class="wrm-modal-header">';
+  if(data.img){
+    headerHtml += '<img class="wrm-modal-img" src="'+data.img+'" alt="'+data.title+'">';
+  }
+  headerHtml += '<div class="wrm-modal-info">';
+  headerHtml += '<h2 class="wrm-modal-title">'+data.title+'</h2>';
+  if(data.desc) headerHtml += '<p class="wrm-modal-desc">'+data.desc+'</p>';
+  headerHtml += '<div class="wrm-modal-price" id="wrm-modal-price">'+fmt(basePrice)+'</div>';
+  headerHtml += '</div></div>'; // /.wrm-modal-info /.wrm-modal-header
+
+  // ── Cuerpo scrollable ─────────────────────────────────────────────────
+  var bodyHtml = '';
+
+  // Variantes como chips horizontales
+  if(variants.length){
+    bodyHtml += '<div class="wrm-modal-section">Elige una opción</div>';
+    bodyHtml += '<div class="wrm-variant-chips">';
+    variants.forEach(function(v, i){
+      bodyHtml += '<button type="button" class="wrm-variant-chip'+(i===0?' selected':'')+'"'+
+        ' data-price="'+v.price+'" data-name="'+v.name+'"'+
+        ' onclick="WRMModal.selectVariant(this)">'+
+        '<span class="vc-name">'+v.name+'</span>'+
+        '<span class="vc-price">'+fmt(v.price)+'</span>'+
+        '</button>';
+    });
+    bodyHtml += '</div>';
+    basePrice = parseFloat(variants[0].price)||basePrice;
+  }
+
+  // Extras — sin cambios (vertical con checkboxes)
+  if(extras.length){
+    bodyHtml += '<div class="wrm-modal-section">Extras (opcional)</div><div class="wrm-extra-list">';
+    extras.forEach(function(e){
+      bodyHtml += '<div class="wrm-extra-item">'+
+        '<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;width:100%">'+
+        '<input type="checkbox" class="wrm-extra-check" data-price="'+e.price+'" data-name="'+e.name+'" onchange="WRMModal.updatePrice()">'+
+        '<span class="e-name">'+e.name+'</span></label>'+
+        '<span class="e-price">+'+fmt(e.price)+'</span></div>';
+    });
+    bodyHtml += '</div>';
+  }
+
+  // Cantidad
+  bodyHtml += '<div class="wrm-modal-section">Cantidad</div>'+
+    '<div class="wrm-modal-qty">'+
+    '<button class="wrm-qty-btn" onclick="WRMModal.changeQty(-1)">−</button>'+
+    '<span class="wrm-qty-val" id="wrm-modal-qty">1</span>'+
+    '<button class="wrm-qty-btn" onclick="WRMModal.changeQty(1)">+</button>'+
+    '</div>';
+
+  // Notas
+  bodyHtml += '<div class="wrm-modal-notes">'+
+    '<div class="wrm-modal-section">Notas (opcional)</div>'+
+    '<textarea id="wrm-modal-notes" placeholder="Sin cebolla, poco picante…"></textarea>'+
+    '</div>';
+
+  // ── Botón sticky flotante ─────────────────────────────────────────────
+  var footerHtml = '<div class="wrm-modal-sticky-footer">'+
+    '<button class="wrm-modal-add-btn" id="wrm-modal-add-btn"'+
+    ' data-id="'+data.id+'" data-title="'+data.title+'"'+
+    ' data-base="'+data.price+'" data-img="'+(data.img||'')+'">'+
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">'+
+    '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>'+
+    '<path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>'+
+    'Agregar al carrito — <span id="wrm-modal-price-btn">'+fmt(basePrice)+'</span>'+
+    '</button>'+
+    '</div>';
+
+  // Inyectar todo en el modal
+  $('#wrm-modal-content').html(headerHtml + '<div class="wrm-modal-body">'+bodyHtml+'</div>' + footerHtml);
+  $('#wrm-product-modal').show();
+  $('body').css('overflow','hidden');
+  window.WRMModal._basePrice = basePrice;
+  window.WRMModal._qty = 1;
+  window.WRMModal.updatePrice();
 }
 window.WRMModal = {
   _basePrice: 0, _qty: 1,
-  selectVariant: function(el){ $('.wrm-variant-item').removeClass('selected'); $(el).addClass('selected'); this._basePrice = parseFloat($(el).data('price'))||0; this.updatePrice(); },
+  selectVariant: function(el){ $('.wrm-variant-chip').removeClass('selected'); $(el).addClass('selected'); this._basePrice = parseFloat($(el).data('price'))||0; this.updatePrice(); },
   changeQty: function(d){ this._qty = Math.max(1, this._qty + d); $('#wrm-modal-qty').text(this._qty); this.updatePrice(); },
-  updatePrice: function(){ var extra = 0; $('.wrm-extra-check:checked').each(function(){ extra += parseFloat($(this).data('price'))||0; }); var total = (this._basePrice + extra) * this._qty; $('#wrm-modal-price').text(fmt(total)); },
-  addToCart: function(){ var $btn=$('#wrm-modal-add-btn'), id=$btn.data('id'), title=$btn.data('title'), img=$btn.data('img'), variant=$('.wrm-variant-item.selected').data('name')||'', extrasArr=[], extraPrice=0; $('.wrm-extra-check:checked').each(function(){ extrasArr.push($(this).data('name')); extraPrice += parseFloat($(this).data('price'))||0; }); var notes=$('#wrm-modal-notes').val().trim(); var price=(this._basePrice + extraPrice); cart.push({ id:id, title:title, price:price, img:img, variant:variant, extras:extrasArr, notes:notes, qty:this._qty }); $('#wrm-product-modal').hide(); $('body').css('overflow',''); flashFAB(); renderCart(); openCart(); }
+  updatePrice: function(){ var extra = 0; $('.wrm-extra-check:checked').each(function(){ extra += parseFloat($(this).data('price'))||0; }); var total = (this._basePrice + extra) * this._qty; $('#wrm-modal-price').text(fmt(total)); $('#wrm-modal-price-btn').text(fmt(total)); },
+  addToCart: function(){ var $btn=$('#wrm-modal-add-btn'), id=$btn.data('id'), title=$btn.data('title'), img=$btn.data('img'), variant=$('.wrm-variant-chip.selected').data('name')||'', extrasArr=[], extraPrice=0; $('.wrm-extra-check:checked').each(function(){ extrasArr.push($(this).data('name')); extraPrice += parseFloat($(this).data('price'))||0; }); var notes=$('#wrm-modal-notes').val().trim(); var price=(this._basePrice + extraPrice); cart.push({ id:id, title:title, price:price, img:img, variant:variant, extras:extrasArr, notes:notes, qty:this._qty }); $('#wrm-product-modal').hide(); $('body').css('overflow',''); flashFAB(); renderCart(); openCart(); }
 };
 window.WRMDelivery = { select: function(mode){ deliveryMode = mode; $('#wrm-opt-pickup, #wrm-opt-delivery').removeClass('selected'); $('#wrm-opt-'+mode).addClass('selected'); var locations=getAvailableLocations(); if(mode==='pickup'){ if(locations.length>1){ $('#wrm-pickup-branch-wrap').show(); } else { $('#wrm-pickup-branch-wrap').hide(); } $('#wrm-delivery-branch-wrap').hide(); if(selectedPickupBranchId===null){ syncSelectedLocation('pickup', 0); } else { syncSelectedLocation('pickup'); } $('#wrm-pickup-confirm').addClass('visible'); $('#wrm-delivery-form-wrap').removeClass('open'); enableOrderBtn(); } else { $('#wrm-pickup-branch-wrap').hide(); $('#wrm-pickup-confirm').removeClass('visible'); if(locations.length>1){ $('#wrm-delivery-branch-wrap').show(); } else { $('#wrm-delivery-branch-wrap').hide(); } if(selectedDeliveryBranchId===null){ syncSelectedLocation('delivery', 0); } else { syncSelectedLocation('delivery'); } $('#wrm-d-city').val(getSelectedLocationCity('delivery')); $('#wrm-delivery-form-wrap').removeClass('open').hide(); validateDelivery(); setTimeout(function(){ openDeliveryModal(); }, 120); } updateDeliveryFee(); $('#wrm-cart-total').text(fmt(getTotal())); }, validate: function(){ validateDelivery(); } };
 function updateDeliveryFee(){ var fee=(window.WRMCart&&WRMCart.delivery_fee)?WRMCart.delivery_fee:''; if(fee){ $('#wrm-fee-sublabel').text('Envío: '+fee); $('#wrm-fee-amount').text(fee); if(deliveryMode==='delivery') $('#wrm-fee-line').show(); else $('#wrm-fee-line').hide(); } }
