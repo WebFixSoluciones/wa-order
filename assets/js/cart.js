@@ -327,16 +327,16 @@ function openProductModal(data){
   // ── Cuerpo scrollable ─────────────────────────────────────────────────
   var bodyHtml = '';
 
-  // Variantes como chips horizontales
+  // Variantes como tarjetas cuadradas (precio arriba + nombre abajo)
   if(variants.length){
     bodyHtml += '<div class="wrm-modal-section">Elige una opción</div>';
-    bodyHtml += '<div class="wrm-variant-chips">';
+    bodyHtml += '<div class="wrm-variant-cards">';
     variants.forEach(function(v, i){
-      bodyHtml += '<button type="button" class="wrm-variant-chip'+(i===0?' selected':'')+'"'+
+      bodyHtml += '<button type="button" class="wrm-variant-card'+(i===0?' selected':'')+'"'+
         ' data-price="'+v.price+'" data-name="'+v.name+'"'+
         ' onclick="WRMModal.selectVariant(this)">'+
-        '<span class="vc-name">'+v.name+'</span>'+
         '<span class="vc-price">'+fmt(v.price)+'</span>'+
+        '<span class="vc-name">'+v.name+'</span>'+
         '</button>';
     });
     bodyHtml += '</div>';
@@ -392,10 +392,10 @@ function openProductModal(data){
 }
 window.WRMModal = {
   _basePrice: 0, _qty: 1,
-  selectVariant: function(el){ $('.wrm-variant-chip').removeClass('selected'); $(el).addClass('selected'); this._basePrice = parseFloat($(el).data('price'))||0; this.updatePrice(); },
+  selectVariant: function(el){ $('.wrm-variant-card').removeClass('selected'); $(el).addClass('selected'); this._basePrice = parseFloat($(el).data('price'))||0; this.updatePrice(); },
   changeQty: function(d){ this._qty = Math.max(1, this._qty + d); $('#wrm-modal-qty').text(this._qty); this.updatePrice(); },
   updatePrice: function(){ var extra = 0; $('.wrm-extra-check:checked').each(function(){ extra += parseFloat($(this).data('price'))||0; }); var total = (this._basePrice + extra) * this._qty; $('#wrm-modal-price').text(fmt(total)); $('#wrm-modal-price-btn').text(fmt(total)); },
-  addToCart: function(){ var $btn=$('#wrm-modal-add-btn'), id=$btn.data('id'), title=$btn.data('title'), img=$btn.data('img'), variant=$('.wrm-variant-chip.selected').data('name')||'', extrasArr=[], extraPrice=0; $('.wrm-extra-check:checked').each(function(){ extrasArr.push($(this).data('name')); extraPrice += parseFloat($(this).data('price'))||0; }); var notes=$('#wrm-modal-notes').val().trim(); var price=(this._basePrice + extraPrice); cart.push({ id:id, title:title, price:price, img:img, variant:variant, extras:extrasArr, notes:notes, qty:this._qty }); $('#wrm-product-modal').hide(); $('body').css('overflow',''); flashFAB(); renderCart(); openCart(); }
+  addToCart: function(){ var $btn=$('#wrm-modal-add-btn'), id=$btn.data('id'), title=$btn.data('title'), img=$btn.data('img'), variant=$('.wrm-variant-card.selected').data('name')||'', extrasArr=[], extraPrice=0; $('.wrm-extra-check:checked').each(function(){ extrasArr.push($(this).data('name')); extraPrice += parseFloat($(this).data('price'))||0; }); var notes=$('#wrm-modal-notes').val().trim(); var price=(this._basePrice + extraPrice); cart.push({ id:id, title:title, price:price, img:img, variant:variant, extras:extrasArr, notes:notes, qty:this._qty }); $('#wrm-product-modal').hide(); $('body').css('overflow',''); flashFAB(); renderCart(); openCart(); }
 };
 window.WRMDelivery = { select: function(mode){ deliveryMode = mode; $('#wrm-opt-pickup, #wrm-opt-delivery').removeClass('selected'); $('#wrm-opt-'+mode).addClass('selected'); var locations=getAvailableLocations(); if(mode==='pickup'){ if(locations.length>1){ $('#wrm-pickup-branch-wrap').show(); } else { $('#wrm-pickup-branch-wrap').hide(); } $('#wrm-delivery-branch-wrap').hide(); if(selectedPickupBranchId===null){ syncSelectedLocation('pickup', 0); } else { syncSelectedLocation('pickup'); } $('#wrm-pickup-confirm').addClass('visible'); $('#wrm-delivery-form-wrap').removeClass('open'); enableOrderBtn(); } else { $('#wrm-pickup-branch-wrap').hide(); $('#wrm-pickup-confirm').removeClass('visible'); if(locations.length>1){ $('#wrm-delivery-branch-wrap').show(); } else { $('#wrm-delivery-branch-wrap').hide(); } if(selectedDeliveryBranchId===null){ syncSelectedLocation('delivery', 0); } else { syncSelectedLocation('delivery'); } $('#wrm-d-city').val(getSelectedLocationCity('delivery')); $('#wrm-delivery-form-wrap').removeClass('open').hide(); validateDelivery(); setTimeout(function(){ openDeliveryModal(); }, 120); } updateDeliveryFee(); $('#wrm-cart-total').text(fmt(getTotal())); }, validate: function(){ validateDelivery(); } };
 function updateDeliveryFee(){ var fee=(window.WRMCart&&WRMCart.delivery_fee)?WRMCart.delivery_fee:''; if(fee){ $('#wrm-fee-sublabel').text('Envío: '+fee); $('#wrm-fee-amount').text(fee); if(deliveryMode==='delivery') $('#wrm-fee-line').show(); else $('#wrm-fee-line').hide(); } }

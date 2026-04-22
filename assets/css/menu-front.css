@@ -411,37 +411,71 @@
   margin: .6rem 0;
 }
 
-/* Chips de variantes horizontales */
-.wrm-variant-chips {
+/* Tarjetas cuadradas de variantes — horizontal scroll */
+.wrm-variant-cards {
   display: flex;
-  flex-wrap: wrap;
-  gap: .45rem;
+  gap: .5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: .25rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
 }
-.wrm-variant-chip {
-  display: inline-flex;
+.wrm-variant-cards::-webkit-scrollbar { display: none; }
+.wrm-variant-card {
+  flex: 0 0 auto;
+  width: 78px;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: .4rem;
-  padding: .42rem .75rem;
+  justify-content: space-between;
+  padding: .55rem .4rem .5rem;
   border: 1.5px solid var(--wrm-border);
-  border-radius: 999px;
+  border-radius: 4px;
   background: #fff;
   cursor: pointer;
-  transition: all .18s;
-  font-size: .8rem;
-  font-family: var(--wrm-font);
-  white-space: nowrap;
-  color: var(--wrm-text);
+  transition: border-color .18s, background .18s, box-shadow .18s;
+  text-align: center;
+  scroll-snap-align: start;
+  gap: .3rem;
 }
-.wrm-variant-chip:hover { border-color: var(--wrm-primary); background: #f0fdf4; }
-.wrm-variant-chip.selected {
+.wrm-variant-card .vc-price {
+  font-size: .82rem;
+  font-weight: 900;
+  color: var(--wrm-primary);
+  line-height: 1;
+}
+.wrm-variant-card .vc-name {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--wrm-dark);
+  line-height: 1.2;
+  word-break: break-word;
+}
+.wrm-variant-card:hover {
   border-color: var(--wrm-primary);
-  background: var(--wrm-primary);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(37,211,102,.3);
+  background: #f0fdf4;
 }
-.wrm-variant-chip .vc-name { font-weight: 600; }
-.wrm-variant-chip .vc-price { font-weight: 800; opacity: .85; font-size: .75rem; }
-.wrm-variant-chip.selected .vc-price { opacity: .95; }
+.wrm-variant-card.selected {
+  border-color: var(--wrm-primary);
+  border-width: 2px;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(37,211,102,.12);
+}
+.wrm-variant-card.selected .vc-price { color: #16a34a; }
+.wrm-variant-card.selected .vc-name { color: #166534; }
+
+/* Mantener compatibilidad — chips (no usadas ya) */
+.wrm-variant-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.wrm-variant-chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .42rem .75rem; border: 1.5px solid var(--wrm-border); border-radius: 999px;
+  background: #fff; cursor: pointer; transition: all .18s; font-size: .8rem;
+  font-family: var(--wrm-font); white-space: nowrap; color: var(--wrm-text);
+}
+.wrm-variant-chip.selected { border-color: var(--wrm-primary); background: var(--wrm-primary); color: #fff; }
 
 /* Extras — sin cambios (vertical con checkboxes) */
 .wrm-variant-list, .wrm-extra-list { display: flex; flex-direction: column; gap: .4rem; }
@@ -502,129 +536,95 @@
 }
 .wrm-no-results p { font-size: 1.5rem; margin-bottom: .5rem; }
 
-/* ── Responsive Móvil: Modal hero (< 540px) ──────────────
-   Efecto "tarjeta flotante sobre imagen": la imagen ocupa
-   el ancho completo y la card de info emerge desde abajo
-   con bordes redondeados y sombra, igual que Uber Eats.
-──────────────────────────────────────────────────────── */
+/* ── Responsive Móvil: Modal compacto (< 540px) ────────────
+   Imagen 90px a la izquierda, descripción completa a la derecha,
+   cuerpo scrollable en el centro, botón sticky siempre visible.
+──────────────────────────────────────────────── */
 @media (max-width: 539px) {
 
-  /* El overlay se alinea al fondo sin padding lateral */
+  /* Overlay: panel desde el fondo, sin padding lateral */
   .wrm-modal-overlay {
     padding: 0;
     align-items: flex-end;
   }
 
-  /* El modal ocupa casi toda la pantalla desde abajo */
+  /* Panel: hoja desde abajo, bordes redondeados arriba */
   .wrm-modal-box {
-    border-radius: 24px 24px 0 0;
-    max-height: 96vh;
+    border-radius: 22px 22px 0 0;
+    max-height: 92vh;
   }
 
-  /* Cabecera: imagen en columna a pantalla completa */
+  /* Cabecera: imagen compacta izq + info der, SIN card-lift
+     para que el flex column del modal funcione correctamente */
   .wrm-modal-header {
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: .85rem;
+    padding: 1rem 1rem 0;
     position: relative;
   }
 
-  /* Hero image — imagen completa sin recorte */
+  /* Imagen más grande en móvil pero compacta (no hero) */
   .wrm-modal-img {
-    width: 100%;
-    min-width: 100%;
-    height: 220px;
-    border-radius: 24px 24px 0 0;
+    width: 90px;
+    min-width: 90px;
+    height: 90px;
+    border-radius: 12px;
     object-fit: cover;
-    object-position: center top;
-    display: block;
+    object-position: center;
     flex-shrink: 0;
   }
 
-  /* Gradiente sutil al pie de la imagen */
-  .wrm-modal-header::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    top: 130px;          /* empieza a 60% de la imagen */
-    height: 90px;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0,0,0,.38) 100%
-    );
-    pointer-events: none;
-    border-radius: 0;
-    z-index: 1;
-  }
-
-  /* Card blanca que emerge sobre la imagen */
+  /* Info: muestra descripción completa, sin line-clamp */
   .wrm-modal-info {
-    position: relative;
-    z-index: 2;
-    background: #fff;
-    border-radius: 20px 20px 0 0;
-    margin-top: -20px;             /* se monta sobre la imagen */
-    padding: 1.1rem 1.2rem .5rem;
-    padding-right: 1.2rem;         /* sin espacio extra, el btn X está arriba */
-    box-shadow: 0 -6px 20px rgba(0,0,0,.10);
+    flex: 1;
+    min-width: 0;
+    padding-top: 0;
+    padding-right: 2.5rem;  /* espacio botón × */
     justify-content: flex-start;
+    gap: .2rem;
   }
 
-  /* Titulo más grande en móvil */
   .wrm-modal-title {
-    font-size: 1.1rem;
-    margin-bottom: .35rem;
-    line-height: 1.2;
-    /* Mostramos el título completo */
-    -webkit-line-clamp: unset;
-    display: block;
-    overflow: visible;
+    font-size: .95rem;
+    margin-bottom: .2rem;
   }
 
-  /* Descripción completa sin clamp */
+  /* Descripción SIN clamp, completamente visible */
   .wrm-modal-desc {
-    font-size: .8rem;
-    line-height: 1.5;
-    margin-bottom: .5rem;
+    font-size: .74rem;
+    line-height: 1.45;
+    margin-bottom: .3rem;
     -webkit-line-clamp: unset;
     display: block;
     overflow: visible;
     max-height: none;
-    color: #6b7280;
   }
 
-  /* Precio prominente */
   .wrm-modal-price {
-    font-size: 1.4rem;
-    font-weight: 900;
+    font-size: 1.2rem;
   }
 
-  /* Botón cerrar — glass sobre la imagen */
-  .wrm-modal-close {
-    position: absolute;
-    top: .7rem;
-    right: .7rem;
-    background: rgba(255,255,255,.88);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,.6);
-    z-index: 20;
-  }
-
-  /* Padding del cuerpo scrollable */
+  /* Cuerpo: menos padding en móvil */
   .wrm-modal-body {
-    padding: .6rem 1.1rem;
+    padding: .55rem 1rem;
   }
 
-  /* Footer sticky más cómodo para pulgar */
+  /* Tarjetas de variante: un poco más anchas en móvil */
+  .wrm-variant-card {
+    width: 82px;
+    min-height: 66px;
+  }
+
+  /* Footer sticky: padding generoso para zona del pulgar */
   .wrm-modal-sticky-footer {
-    padding: .85rem 1.1rem max(1.2rem, env(safe-area-inset-bottom));
+    padding: .8rem 1rem max(1rem, env(safe-area-inset-bottom));
   }
 
   .wrm-modal-add-btn {
-    padding: .95rem;
-    font-size: 1rem;
-    border-radius: 14px;
+    padding: .9rem;
+    font-size: .95rem;
+    border-radius: 12px;
   }
 }
 
