@@ -521,24 +521,59 @@
 }
 .wrm-variant-chip.selected { border-color: var(--wrm-primary); background: var(--wrm-primary); color: #fff; }
 
-/* Extras — sin cambios (vertical con checkboxes) */
-.wrm-variant-list, .wrm-extra-list { display: flex; flex-direction: column; gap: .4rem; }
-.wrm-variant-item, .wrm-extra-item {
+/* ── Extras — iOS style ─────────────────────────────── */
+.wrm-extra-list { display: flex; flex-direction: column; gap: .45rem; }
+
+.wrm-extra-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .55rem .75rem;
-  border: 1.5px solid var(--wrm-border);
-  border-radius: 10px;
+  padding: .65rem .85rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;           /* iOS rounded */
+  background: #f9fafb;
   cursor: pointer;
-  transition: all .2s;
+  transition: border-color .15s ease,
+              background .15s ease,
+              box-shadow .15s ease,
+              transform .12s ease;
   font-size: .85rem;
+  -webkit-tap-highlight-color: transparent;
 }
-.wrm-variant-item:hover, .wrm-extra-item:hover { border-color: var(--wrm-primary); background: #f0fdf4; }
-.wrm-variant-item.selected { border-color: var(--wrm-primary); background: #f0fdf4; }
-.wrm-variant-item .v-name, .wrm-extra-item .e-name { font-weight: 600; }
-.wrm-variant-item .v-price, .wrm-extra-item .e-price { color: var(--wrm-primary); font-weight: 700; font-size: .82rem; }
-.wrm-extra-item input[type=checkbox] { accent-color: var(--wrm-primary); width: 16px; height: 16px; }
+.wrm-extra-item:hover {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+.wrm-extra-item:active {
+  transform: scale(.98);
+}
+.wrm-extra-item.selected {
+  border-color: #22c55e;
+  background: #fff;
+  box-shadow: 0 1px 8px rgba(34,197,94,.12);
+  transform: translateY(-1px);
+}
+.wrm-extra-item .e-name {
+  font-weight: 600;
+  color: #374151;
+}
+.wrm-extra-item.selected .e-name {
+  color: #111827;
+}
+.wrm-extra-item .e-price {
+  color: #10b981;
+  font-weight: 800;
+  font-size: .82rem;
+}
+/* Estilo nativo agrandado para el checkbox */
+.wrm-extra-item input[type=checkbox] {
+  accent-color: #22c55e;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
+}
 
 .wrm-modal-qty { display: flex; align-items: center; gap: .75rem; margin: .5rem 0 .75rem; }
 .wrm-qty-btn {

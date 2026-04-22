@@ -2,7 +2,7 @@
 
 Plugin de pedidos por WhatsApp para WordPress con soporte multi-sucursal.
 
-Desarrollado por [WebFix](https://webfix.ec).
+Desarrollado por [WebFix](https://webfixsoluciones.net).
 
 ## Características
 - 🛒 Carrito de compras flotante (Popup).
