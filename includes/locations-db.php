@@ -16,6 +16,7 @@ function wrm_create_locations_table(){
         location_type varchar(20) NOT NULL DEFAULT 'branch',
         name varchar(190) NOT NULL DEFAULT '',
         address text NULL,
+        city varchar(100) NOT NULL DEFAULT '',
         phone varchar(50) NOT NULL DEFAULT '',
         whatsapp varchar(50) NOT NULL DEFAULT '',
         coverage text NULL,
@@ -31,7 +32,7 @@ function wrm_create_locations_table(){
         KEY sort_order (sort_order)
     ) {$charset};";
     dbDelta($sql);
-    update_option('wrm_locations_db_version', '1.0.0');
+    update_option('wrm_locations_db_version', '1.1.0');
 }
 
 function wrm_default_location_row($type='branch'){
@@ -39,6 +40,7 @@ function wrm_default_location_row($type='branch'){
         'location_type' => $type,
         'name' => '',
         'address' => '',
+        'city' => '',
         'phone' => '',
         'whatsapp' => '',
         'coverage' => '',
@@ -55,6 +57,7 @@ function wrm_normalize_location_db_row($row, $defaults = []){
         'location_type' => in_array(($row['location_type'] ?? 'branch'), ['matrix','branch'], true) ? $row['location_type'] : 'branch',
         'name' => sanitize_text_field($row['name'] ?? ''),
         'address' => sanitize_text_field($row['address'] ?? ''),
+        'city' => sanitize_text_field($row['city'] ?? ''),
         'phone' => sanitize_text_field($row['phone'] ?? ''),
         'whatsapp' => preg_replace('/[^0-9]/','', (string)($row['whatsapp'] ?? '')),
         'coverage' => sanitize_text_field($row['coverage'] ?? ''),
@@ -89,7 +92,7 @@ function wrm_replace_locations_by_type($type, $rows){
         $clean['sort_order'] = $i;
         $clean['created_at'] = current_time('mysql');
         $clean['updated_at'] = current_time('mysql');
-        $wpdb->insert($table, $clean, ['%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%s','%s']);
+        $wpdb->insert($table, $clean, ['%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%s','%s']);
         $i += 1;
     }
 }
@@ -113,6 +116,7 @@ function wrm_maybe_migrate_options_to_locations_table($force = false){
         'location_type' => 'matrix',
         'name' => sanitize_text_field($matrix['name'] ?? ''),
         'address' => sanitize_text_field($matrix['address'] ?? ''),
+        'city' => sanitize_text_field($matrix['city'] ?? ''),
         'phone' => sanitize_text_field($matrix['phone'] ?? ''),
         'whatsapp' => preg_replace('/[^0-9]/','', $matrix['whatsapp'] ?? ''),
         'coverage' => sanitize_text_field($matrix['coverage'] ?? ''),
@@ -128,6 +132,7 @@ function wrm_maybe_migrate_options_to_locations_table($force = false){
             'location_type' => 'branch',
             'name' => sanitize_text_field($b['name'] ?? ''),
             'address' => sanitize_text_field($b['address'] ?? ''),
+            'city' => sanitize_text_field($b['city'] ?? ''),
             'phone' => sanitize_text_field($b['phone'] ?? ''),
             'whatsapp' => preg_replace('/[^0-9]/','', $b['whatsapp'] ?? ''),
             'coverage' => sanitize_text_field($b['coverage'] ?? ''),

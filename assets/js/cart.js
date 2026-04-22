@@ -82,6 +82,14 @@ function getSelectedLocationCity(mode){
   return loc && loc.city ? String(loc.city).trim() : '';
 }
 
+// Bug 2 fix: safe accessor used by buildWhatsAppMessage and external callers
+function getSelectedLocationData(mode){
+  if(!mode) mode = deliveryMode;
+  if(mode === 'pickup') return selectedPickupBranch || null;
+  if(mode === 'delivery') return selectedDeliveryBranch || null;
+  return null;
+}
+
 function syncSelectedLocation(mode, forcedIdx){
   var locations = getAvailableLocations();
   if(!locations.length) return;
@@ -161,6 +169,8 @@ function ensureCleanBranchStyles(){
     '.wrm-delivery-open-btn small{display:block;font-size:.78rem;font-weight:500;color:#6b7280;margin-top:.15rem;}'+
     '@media (min-width:768px){.wrm-branch-cards{flex-wrap:wrap;overflow:visible;padding-bottom:.05rem;scroll-snap-type:none}.wrm-branch-card-mini{flex:1 1 calc(33.333% - .4rem);min-width:0;max-width:none}.wrm-branch-scroll-hint{display:none}}'+
     '@media (max-width:767px){.wrm-branch-scroll-hint.has-more{display:block}}'+
+    // Bug 4 fix: removed duplicated delivery-modal CSS rules that conflicted with
+    // the canonical definitions in cart-front.css. Only branch-card styles are injected here.
     '@media (max-width:480px){.wrm-branch-card-mini{flex:0 0 154px;min-width:154px;max-width:170px;padding:.72rem .72rem}.wrm-branch-card-mini .wrm-branch-name{font-size:.74rem}.wrm-branch-card-mini .wrm-branch-sub{font-size:.72rem}}';
   var style = document.createElement('style');
   style.id = 'wrm-branch-clean-styles';
@@ -227,20 +237,24 @@ function openDeliveryModal(){
   $mb.find('#wrm-m-sector').val($('#wrm-d-sector').val()||'');
   $mb.find('#wrm-m-city').val(getSelectedLocationCity('delivery')||$('#wrm-d-city').val()||'');
   $mb.find('#wrm-m-ref').val($('#wrm-d-ref').val()||'');
+  // Bug 3 fix: open the modal first, then do NOT re-lock body scroll.
+  // The cart popup already locked it; double-locking caused freeze on modal close.
   $('#wrm-delivery-modal').addClass('open').attr('aria-hidden','false');
-  $('body').css('overflow','hidden');
   var feeHtml = $('#wrm-fee-line').length ? $('#wrm-fee-line').prop('outerHTML') : '';
   if(feeHtml && !$mb.find('#wrm-fee-line').length){ $mb.find('.wrm-delivery-form').append(feeHtml); }
   validateDeliveryModal();
 }
 
 function closeDeliveryModal(){
-  var $form = $('#wrm-delivery-form-wrap');
-  if($('#wrm-cart-footer').length){
-    $form.insertBefore('#wrm-cart-footer').removeClass('open').hide();
-  }
+  try {
+    var $form = $('#wrm-delivery-form-wrap');
+    if($('#wrm-cart-footer').length){
+      $form.insertBefore('#wrm-cart-footer').removeClass('open').hide();
+    }
+    syncDeliveryModalToBase();
+  } catch(e) { /* safety net — never leave scroll locked */ }
   $('#wrm-delivery-modal').removeClass('open').attr('aria-hidden','true');
-  $('body').css('overflow','');
+  $('body').css('overflow',''); // Bug 3 fix: always restore scroll
 }
 function ensureBranchSelectors(){
   if(!$('#wrm-pickup-branch-wrap').length && $('#wrm-pickup-confirm').length){

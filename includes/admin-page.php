@@ -119,7 +119,7 @@ function wrm_plugin_settings_page(){
 .wrm-inline-note{font-size:.74rem;color:#6b7280;margin-top:.2rem}
 </style>
 <div class="wrm-p">
-<h1>🟢 WA Order <span class="wrm-badge">v0.8.6</span></h1>
+<h1>🟢 WA Order <span class="wrm-badge">v0.9.0</span></h1>
 <form method="post"><?php wp_nonce_field('wrm_plugin_nonce')?>
 <div class="wrm-tabs">
   <button type="button" class="wrm-tab-btn active" data-tab="general">General</button>
