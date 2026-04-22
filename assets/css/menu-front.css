@@ -113,6 +113,135 @@
   }
 }
 
+/* ── Sección Promociones / Destacados ───────────────────── */
+.wrm-promos-wrap {
+  margin: 1.5rem 0 .5rem;
+}
+.wrm-promos-heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--wrm-dark);
+  margin-bottom: .85rem;
+  letter-spacing: -.02em;
+}
+.wrm-promos-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 1rem;
+  padding-top: .2rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+.wrm-promos-scroll::-webkit-scrollbar { display: none; }
+
+.wrm-promo-card {
+  flex: 0 0 auto;
+  width: 220px;
+  background: var(--wrm-surface);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--wrm-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,.04);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.wrm-promo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+.wrm-promo-img-wrap {
+  width: 100%;
+  height: 135px;
+  position: relative;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+.wrm-promo-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wrm-promo-img-wrap .wrm-item-badge {
+  position: absolute;
+  top: .5rem;
+  left: .5rem;
+  background: #f97316;
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: .2rem .4rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.3);
+}
+.wrm-promo-img-wrap .wrm-item-featured-badge {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  background: #fff;
+  border-radius: 50%;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,.15);
+}
+
+.wrm-promo-body {
+  padding: .85rem .85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.wrm-promo-title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--wrm-dark);
+  margin-bottom: .4rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wrm-promo-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.wrm-promo-add-btn {
+  background: #fff;
+  color: var(--wrm-primary);
+  border: 1.5px solid var(--wrm-border);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all .2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+.wrm-promo-add-btn:hover {
+  background: var(--wrm-primary);
+  color: #fff;
+  border-color: var(--wrm-primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(37,211,102,.2);
+}
+.wrm-promo-add-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* ── Tarjeta de producto (horizontal) ────────────────── */
 .wrm-item-card {
   background: var(--wrm-surface);

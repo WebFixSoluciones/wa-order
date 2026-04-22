@@ -58,6 +58,10 @@ function wrm_menu_shortcode($atts=[]){
     $items = new WP_Query($q_args);
     $opts = get_option('wrm_settings',[]);
     $cur  = $opts['currency'] ?? '$';
+    
+    $html_promos = '';
+    $html_grid   = '';
+
     while($items->have_posts()): $items->the_post();
         $id       = get_the_ID();
         $price    = (float)(get_post_meta($id,'_wrm_price',true)   ?: 0);
@@ -72,6 +76,13 @@ function wrm_menu_shortcode($atts=[]){
         $cats_str = implode(' ',$item_cats);
         $img      = get_the_post_thumbnail_url($id,'medium') ?: '';
         $desc     = get_the_excerpt() ?: wp_trim_words(get_the_content(), 15, '…');
+
+        /* Es promocional si es destacado (estrella) o el badge dice oferta/promo/nuevo */
+        $b_lower = strtolower((string)$badge);
+        $is_promo = $featured || (strpos($b_lower, 'oferta') !== false) || (strpos($b_lower, 'promo') !== false) || (strpos($b_lower, 'nuevo') !== false);
+
+        /* ── Grid normal ────────────────────────────── */
+        ob_start();
   ?>
   <div class="wrm-item-card <?php echo $avail?'':'wrm-unavailable'?> <?php echo $featured?'wrm-featured':''?>"
        data-id="<?php echo $id?>"
@@ -116,7 +127,58 @@ function wrm_menu_shortcode($atts=[]){
       </div>
     </div>
   </div>
-  <?php endwhile; wp_reset_postdata();?>
+  <?php 
+        $html_grid .= ob_get_clean();
+
+        /* ── Tarjeta Promocional Horizontal ─────────── */
+        if($is_promo && $avail){
+            ob_start();
+            ?>
+            <div class="wrm-promo-card">
+              <div class="wrm-promo-img-wrap" <?php if(!$img):?>style="display:none"<?php endif;?>>
+                <?php if($img):?><img src="<?php echo esc_url($img)?>" alt="<?php echo esc_attr(get_the_title())?>" loading="lazy"><?php endif;?>
+                <?php if($badge):?><span class="wrm-item-badge"><?php echo esc_html($badge)?></span><?php endif;?>
+                <?php if($featured):?><span class="wrm-item-featured-badge">🔥</span><?php endif;?>
+              </div>
+              <div class="wrm-promo-body">
+                <h3 class="wrm-promo-title"><?php the_title()?></h3>
+                <div class="wrm-promo-bottom">
+                  <div class="wrm-item-price-wrap">
+                    <span class="wrm-item-price"><?php echo esc_html($cur).number_format($price,2)?></span>
+                    <?php if($old>0):?><span class="wrm-item-price-old"><?php echo esc_html($cur).number_format($old,2)?></span><?php endif;?>
+                  </div>
+                  <button class="wrm-add-btn wrm-promo-add-btn" 
+                          data-id="<?php echo $id?>"
+                          data-title="<?php echo esc_attr(get_the_title())?>"
+                          data-price="<?php echo esc_attr($price)?>"
+                          data-img="<?php echo esc_attr($img)?>"
+                          data-variants='<?php echo esc_attr(wp_json_encode($variants))?>'
+                          data-extras='<?php echo esc_attr(wp_json_encode($extras))?>'>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <?php
+            $html_promos .= ob_get_clean();
+        }
+
+    endwhile; wp_reset_postdata();
+  ?>
+
+  <!-- Sección: Promociones / Destacados -->
+  <?php if($html_promos): ?>
+  <div class="wrm-promos-wrap" id="wrm-promos-wrap">
+    <h2 class="wrm-promos-heading">Artículos destacados</h2>
+    <div class="wrm-promos-scroll">
+      <?php echo $html_promos; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <!-- Grid de productos -->
+  <div class="wrm-items-grid" id="wrm-items-grid">
+    <?php echo $html_grid; ?>
   </div><!-- /.wrm-items-grid -->
 
   <div class="wrm-no-results" id="wrm-no-results" style="display:none">
