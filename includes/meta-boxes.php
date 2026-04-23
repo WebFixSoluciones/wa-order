@@ -36,19 +36,15 @@ function wrm_render_item_meta($post){
     <select name="wrm_badge">
       <option value="" <?php selected($badge,'')?>>Sin etiqueta</option>
       <?php 
-      $hardcoded_badges = ['Nuevo', '2x1', 'Destacado', 'Más vendido', 'Oferta'];
       $tags = get_terms(['taxonomy' => 'wrm_tag', 'hide_empty' => false]);
-      $dynamic_badges = [];
       if(!is_wp_error($tags) && !empty($tags)){
-          foreach($tags as $t){
-              $dynamic_badges[] = $t->name;
-          }
-      }
-      $all_badges = array_unique(array_merge($hardcoded_badges, $dynamic_badges));
-      foreach($all_badges as $b):
+          foreach($tags as $t):
       ?>
-      <option value="<?php echo esc_attr($b)?>" <?php selected($badge,$b)?>><?php echo esc_html($b)?></option>
-      <?php endforeach; ?>
+      <option value="<?php echo esc_attr($t->name)?>" <?php selected($badge,$t->name)?>><?php echo esc_html($t->name)?></option>
+      <?php 
+          endforeach; 
+      }
+      ?>
     </select>
   </div>
   <div class="wrm-meta-f">

@@ -28,11 +28,10 @@ function wrm_register_post_type(){
             'edit_item'         =>'Editar etiqueta',
             'search_items'      =>'Buscar etiquetas',
         ],
-        'hierarchical'      =>true,
+        'hierarchical'      =>false,
         'show_ui'           =>true,
         'show_in_rest'      =>true,
         'show_admin_column' =>true,
-        'meta_box_cb'       =>'post_categories_meta_box',
         'rewrite'           =>['slug'=>'menu-etiqueta'],
     ]);
 
