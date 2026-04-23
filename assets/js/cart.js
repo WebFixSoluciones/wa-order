@@ -478,6 +478,10 @@ $(document).ready(function(){
     var $grid = $('#wrm-items-grid');
     var $cards = $grid.find('.wrm-item-card');
     var searchVal = ($('#wrm-search').val() || '').toLowerCase().trim();
+    
+    // Ocultar promociones si hay filtro o búsqueda
+    $('#wrm-promos-wrap').toggle(cat === 'all' && !searchVal);
+    
     var visibleCount = 0;
     $cards.each(function(){
       var $card = $(this);
@@ -496,6 +500,10 @@ $(document).ready(function(){
     var activeCat = $('.wrm-cat-tab.active').data('cat') || 'all';
     var $cards = $('#wrm-items-grid .wrm-item-card');
     var visibleCount = 0;
+    
+    // Ocultar promociones si hay filtro o búsqueda
+    $('#wrm-promos-wrap').toggle(activeCat === 'all' && !val);
+
     // Mostrar/ocultar botón clear
     $('#wrm-search-clear').toggle(val.length > 0);
     $cards.each(function(){

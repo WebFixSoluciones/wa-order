@@ -19,6 +19,23 @@ function wrm_register_post_type(){
         'rewrite'           =>['slug'=>'menu-categoria'],
     ]);
 
+    /* ── Etiquetas del menú ──────────────────────────── */
+    register_taxonomy('wrm_tag',['wrm_item'],[
+        'labels'=>[
+            'name'              =>'Etiquetas del menú',
+            'singular_name'     =>'Etiqueta',
+            'add_new_item'      =>'Nueva etiqueta',
+            'edit_item'         =>'Editar etiqueta',
+            'search_items'      =>'Buscar etiquetas',
+        ],
+        'hierarchical'      =>true,
+        'show_ui'           =>true,
+        'show_in_rest'      =>true,
+        'show_admin_column' =>true,
+        'meta_box_cb'       =>'post_categories_meta_box',
+        'rewrite'           =>['slug'=>'menu-etiqueta'],
+    ]);
+
     /* ── Post type: item del menú ───────────────────── */
     register_post_type('wrm_item',[
         'labels'=>[
@@ -38,6 +55,6 @@ function wrm_register_post_type(){
         'menu_position' =>5,
         'menu_icon'     =>'dashicons-food',
         'rewrite'       =>['slug'=>'menu-item'],
-        'taxonomies'    =>['wrm_category'],
+        'taxonomies'    =>['wrm_category', 'wrm_tag'],
     ]);
 }

@@ -14,6 +14,7 @@ function wrm_plugin_admin_menu(){
     );
     add_submenu_page('wrm-menu-admin','Ítems del menú','📋 Ítems del menú','manage_options','edit.php?post_type=wrm_item');
     add_submenu_page('wrm-menu-admin','Categorías','🗂️ Categorías','manage_options','edit-tags.php?taxonomy=wrm_category&post_type=wrm_item');
+    add_submenu_page('wrm-menu-admin','Etiquetas','🏷️ Etiquetas','manage_options','edit-tags.php?taxonomy=wrm_tag&post_type=wrm_item');
 }
 
 function wrm_get_branch_defaults(){

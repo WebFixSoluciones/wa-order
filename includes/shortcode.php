@@ -42,8 +42,7 @@ function wrm_menu_shortcode($atts=[]){
   </div>
   <?php endif;?>
 
-  <!-- Grid de productos -->
-  <div class="wrm-items-grid" id="wrm-items-grid">
+
   <?php
     /* ── Query de ítems ─────────────────────────── */
     $q_args = [
@@ -74,12 +73,13 @@ function wrm_menu_shortcode($atts=[]){
         $extras   = get_post_meta($id,'_wrm_extras',true)   ?: [];
         $item_cats= wp_get_post_terms($id,'wrm_category',['fields'=>'slugs']);
         $cats_str = implode(' ',$item_cats);
+        $item_tags= wp_get_post_terms($id,'wrm_tag');
         $img      = get_the_post_thumbnail_url($id,'medium') ?: '';
         $desc     = get_the_excerpt() ?: wp_trim_words(get_the_content(), 15, '…');
 
-        /* Es promocional si es destacado (estrella) o el badge dice oferta/promo/nuevo */
+        /* Es promocional si es destacado o el badge dice promo */
         $b_lower = strtolower((string)$badge);
-        $is_promo = $featured || (strpos($b_lower, 'oferta') !== false) || (strpos($b_lower, 'promo') !== false) || (strpos($b_lower, 'nuevo') !== false);
+        $is_promo = $featured || (strpos($b_lower, 'promo') !== false);
 
         /* ── Grid normal ────────────────────────────── */
         ob_start();
@@ -101,6 +101,13 @@ function wrm_menu_shortcode($atts=[]){
 
     <div class="wrm-item-body">
       <h3 class="wrm-item-title"><?php the_title()?></h3>
+      <?php if(!empty($item_tags)): ?>
+      <div class="wrm-item-tags">
+        <?php foreach($item_tags as $t): ?>
+          <span class="wrm-tag-pill"><?php echo esc_html($t->name)?></span>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
       <?php if($desc):?><p class="wrm-item-desc"><?php echo esc_html($desc)?></p><?php endif;?>
 
       <div class="wrm-item-footer">
@@ -167,14 +174,19 @@ function wrm_menu_shortcode($atts=[]){
   ?>
 
   <!-- Sección: Promociones / Destacados -->
-  <?php if($html_promos): ?>
   <div class="wrm-promos-wrap" id="wrm-promos-wrap">
     <h2 class="wrm-promos-heading">Artículos destacados</h2>
     <div class="wrm-promos-scroll">
-      <?php echo $html_promos; ?>
+      <?php if($html_promos): ?>
+        <?php echo $html_promos; ?>
+      <?php else: ?>
+        <div class="wrm-no-promos-msg">
+          <div class="icon">🌟</div>
+          <p>Por lo pronto no tenemos promociones destacadas.<br>¡Revisa nuestro delicioso menú a continuación!</p>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
-  <?php endif; ?>
 
   <!-- Grid de productos -->
   <div class="wrm-items-grid" id="wrm-items-grid">
